@@ -1,0 +1,73 @@
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+from sklearn.naive_bayes import MultinomialNB
+
+from sklearn.metrics import accuracy_score, classification_report
+
+data = {
+
+    'label': ['ham', 'spam', 'ham', 'ham', 'spam', 'ham', 'spam', 'ham'],
+
+    'message': [
+
+        "Hello, how are you?",
+
+        "Congratulations! You’ve won a lottery of $1000",
+
+        "Don’t forget our meeting tomorrow",
+
+        "Your subscription is renewed",
+
+        "Click here to claim your prize!",
+
+        "Limited time offer! Get your discount now",
+
+        "Have a great day!",
+
+        "See you tomorrow"
+
+    ]
+
+}
+
+df = pd.DataFrame(data)
+
+X = df['message']
+
+y = df['label']
+
+X_train, X_test, y_train, y_test = train_test_split(
+
+    X, y, test_size=0.5, random_state=42, stratify=y
+
+)
+
+vectorizer = CountVectorizer()
+
+X_train_vect = vectorizer.fit_transform(X_train)
+
+X_test_vect = vectorizer.transform(X_test)
+
+model = MultinomialNB()
+
+model.fit(X_train_vect, y_train)
+
+y_pred = model.predict(X_test_vect)
+
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"Accuracy: {accuracy * 100:.2f}%")
+
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+new_message = ["How are you?"]
+
+new_message_vect = vectorizer.transform(new_message)
+
+new_pred = model.predict(new_message_vect)
+
+print(f"\nPredicted label for new message: {new_pred[0]}")
