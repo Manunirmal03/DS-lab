@@ -1,0 +1,68 @@
+from sklearn import datasets, preprocessing, neighbors
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load the Iris dataset
+iris = datasets.load_iris()
+print("Iris data")
+print(iris)
+
+print("\nIris feature names:")
+print(iris.feature_names)
+
+print("\nTarget names (0=setosa, 1=versicolor, 2=virginica):")
+print(iris.target_names)
+
+print("\nTotal 150 observations and 4 features:")
+print(iris.data.shape)
+
+# Split the data
+x, y = iris.data, iris.target
+x_train, x_test, y_train, y_test = train_test_split(
+    x, y, stratify=y, random_state=0, train_size=0.7
+)
+
+print("\nShape of train and test objects:")
+print("x_train shape:", x_train.shape)
+print("x_test shape:", x_test.shape)
+print("y_train shape:", y_train.shape)
+print("y_test shape:", y_test.shape)
+
+# Standardize the features
+scaler = preprocessing.StandardScaler().fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+
+# Train and evaluate KNN for different values of k
+scores = []
+k_range = range(1, 15)
+for k in k_range:
+    knn = neighbors.KNeighborsClassifier(n_neighbors=k)
+    knn.fit(x_train, y_train)
+    y_pred = knn.predict(x_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    scores.append(accuracy)
+
+# Plot accuracy vs. k
+plt.plot(k_range, scores)
+plt.xlabel('Value of K for KNN')
+plt.ylabel('Testing Accuracy')
+plt.title('KNN Accuracy for Different K Values')
+plt.grid(True)
+plt.show()
+
+# Final evaluation with the best k
+best_k = k_range[np.argmax(scores)]
+print(f"\nBest K: {best_k} with accuracy: {max(scores):.2f}")
+
+knn = neighbors.KNeighborsClassifier(n_neighbors=best_k)
+knn.fit(x_train, y_train)
+y_pred = knn.predict(x_test)
+
+print("\nPrediction of species:", y_pred)
+print("Accuracy score:", accuracy_score(y_test, y_pred))
+print("Confusion matrix:\n", confusion_matrix(y_test, y_pred))
+print("Classification report:\n", classification_report(y_test, y_pred))
+
