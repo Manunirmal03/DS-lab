@@ -1,0 +1,109 @@
+from sklearn import datasets, preprocessing, neighbors
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+import matplotlib.pyplot as plt
+
+# Load the iris dataset
+
+iris = datasets.load_iris()
+
+print("Iris feature names:")
+
+print(iris.feature_names)
+
+print("\nInteger representing features (0=setosa, 1=versicolor, 2=virginica):")
+
+print(iris.target)
+
+print("\n3 Classes of target:")
+
+print(iris.target_names)
+
+print("\nTotal of 150 observations and 4 features:")
+
+print(iris.data.shape)
+
+# Prepare data
+
+x, y = iris.data, iris.target
+
+# Split data into training and test sets
+
+x_train, x_test, y_train, y_test = train_test_split(
+
+    x, y, test_size=0.1, random_state=42
+
+)
+
+print("\nShape of train and test objects:")
+
+print("x_train shape:", x_train.shape)
+
+print("x_test shape:", x_test.shape)
+
+print("\ny_train:")
+
+print(y_train)
+
+print("\ny_test:")
+
+print(y_test)
+
+print("y_train shape:", y_train.shape)
+
+# Feature scaling
+
+scaler = preprocessing.StandardScaler().fit(x_train)
+
+x_train = scaler.transform(x_train)
+
+x_test = scaler.transform(x_test)
+
+# Train and evaluate KNN classifier for k in range 1 to 14
+
+scores = []
+
+k_range = range(1, 15)
+
+for k in k_range:
+
+    knn = neighbors.KNeighborsClassifier(n_neighbors=k)
+
+    knn.fit(x_train, y_train)
+
+    y_pred = knn.predict(x_test)
+
+    accuracy = accuracy_score(y_test, y_pred)
+
+    scores.append(accuracy)
+
+# Display final results for the last k (k=14)
+
+print("\nPrediction of species:", y_pred)
+
+print("Accuracy score:", accuracy_score(y_test, y_pred))
+
+print("Confusion matrix:\n", confusion_matrix(y_test, y_pred))
+
+print("Classification Report:\n", classification_report(y_test, y_pred))
+
+# Plot accuracy vs k
+
+plt.plot(k_range, scores, marker='o')
+
+plt.xlabel("Value of K for KNN")
+
+plt.ylabel("Testing Accuracy")
+
+plt.title("KNN Accuracy for Different K Values")
+
+plt.grid(True)
+
+plt.show()
+
+# Final result
+
+print("\nResult:\nProgram Executed Successfully.")
